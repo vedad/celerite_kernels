@@ -57,8 +57,8 @@ if __name__ == "__main__":
     k_isho = IntegratedSHOTerm(log_S0=log_S0, log_omega0=log_omega0,
                                log_Q=log_Q, t_exp=t_exp)
     gp_isho = celerite.GP(k_isho, mean=np.mean(y), fit_mean=False)
-    print_stuff(gp_isho, y)
     gp_isho.compute(t, yerr)
+    print_stuff(gp_isho, y)
 
     # make predictions
     mu_sho, var_sho = gp_sho.predict(y, true_t, return_var=True)
