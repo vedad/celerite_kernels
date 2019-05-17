@@ -24,8 +24,7 @@ class IntegratedSHOTerm(SHOTerm, Term):
         a, b, c, d = super(IntegratedSHOTerm,
                            self).get_complex_coefficients(params[:-1])
 
-        A, B = self.get_complex_attenuation((a, b, c, d))
-        f    = complex(a, b) * complex(A, B)
+        f = complex(*self.get_complex_attenuation((a, b, c, d)))
 
         # new coefficients accounting for attenuation
         a_tilde, b_tilde = f.real, f.imag

@@ -13,7 +13,7 @@ def create_data():
 
     # time in units of minutes
     dead_time        = 1/60
-    integration_time = 2/60
+    integration_time = 60/60
     dt               = integration_time + dead_time
 
     # units of hours
@@ -33,8 +33,13 @@ def print_stuff(gp, y):
     print("parameter_names:\n{0}\n".format(gp.get_parameter_names()))
     print("parameter_vector:\n{0}\n".format(gp.get_parameter_vector()))
     print("parameter_bounds:\n{0}\n".format(gp.get_parameter_bounds()))
-    print('complex coefficients inside SHOTerm: ', 
-            gp.kernel.get_complex_coefficients((log_S0, log_Q, log_omega0)))
+#    try:
+#        print('complex coefficients inside SHOTerm: ', 
+#                gp.kernel.get_complex_coefficients((log_S0, log_Q, log_omega0)))
+#    except ValueError:
+#        print('complex coefficients inside SHOTerm: ', 
+#                gp.kernel.get_complex_coefficients((log_S0, log_Q, log_omega0,
+#                    t_exp)))
 
 if __name__ == "__main__":
     # data from asteroseismic example in the original celerite paper
@@ -51,18 +56,23 @@ if __name__ == "__main__":
     gp_sho = celerite.GP(k_sho, mean=np.mean(y), fit_mean=False)
     gp_sho.compute(t, yerr)
     print_stuff(gp_sho, y)
+    print('complex coefficients inside SHOTerm: ', 
+          gp_sho.kernel.get_complex_coefficients((log_S0, log_Q, log_omega0)))
 
     # integrated SHO kernel
-    t_exp = 2/60 # 2 minute exposures
+    t_exp = 60/60  # 1 h exposures
     k_isho = IntegratedSHOTerm(log_S0=log_S0, log_omega0=log_omega0,
                                log_Q=log_Q, t_exp=t_exp)
     gp_isho = celerite.GP(k_isho, mean=np.mean(y), fit_mean=False)
     gp_isho.compute(t, yerr)
     print_stuff(gp_isho, y)
+    print('complex coefficients inside IntegratedSHOTerm: ', 
+          gp_isho.kernel.get_complex_coefficients((log_S0, log_Q, log_omega0, t_exp)))
 
     # make predictions
     mu_sho, var_sho = gp_sho.predict(y, true_t, return_var=True)
     mu_isho, var_isho = gp_isho.predict(y, true_t, return_var=True)
+    print(mu_sho, mu_isho)
 
     # data and true
     plt.plot(true_t, true_y, "k", lw=1.5, alpha=0.3)
